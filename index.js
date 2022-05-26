@@ -45,12 +45,13 @@ class Player {
     update(){
         this.positon.y += this.velocity.y;
         this.positon.x += this.velocity.x;
+        this.velocity.y += gravity;
 
-        if(this.positon.y + this.height + this.velocity.y >= canvas.height){
-            this.velocity.y = 0;
-        } else {
-            this.velocity.y += gravity;
-        }
+        // if(this.positon.y + this.height + this.velocity.y >= canvas.height){
+        //     this.velocity.y += 0;
+        // } else {
+        //     this.velocity.y += gravity;
+        // }
         this.draw();
     }
 }
@@ -102,10 +103,9 @@ const player = new Player();
 
 const platforms = [
     new Platform({positon:{x: 0, y: 450 }, imageSRC: platformSRC }),
-    new Platform({positon:{x: platformImage.width -4, y: 450 }, imageSRC: platformSRC }),
-    new Platform({positon:{x: (platformImage.width * 2) -5, y: 450 }, imageSRC: platformSRC }),
-    new Platform({positon:{x: (platformImage.width * 3) -6, y: 450 }, imageSRC: platformSRC }),
-    new Platform({positon:{x: (platformImage.width * 4) -7, y: 450 }, imageSRC: platformSRC }),
+    new Platform({positon:{x: platformImage.width + 100, y: 450 }, imageSRC: platformSRC }),
+    new Platform({positon:{x: (platformImage.width * 2) + 300, y: 450 }, imageSRC: platformSRC }),
+    new Platform({positon:{x: (platformImage.width * 3) + 600, y: 450 }, imageSRC: platformSRC }),
 ];
 
 
