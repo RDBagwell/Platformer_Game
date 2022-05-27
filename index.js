@@ -1,61 +1,37 @@
-const platformSRC = './assets/images/platform.png';
-const tallPlatform = './assets/images/platformSmallTall.png';
-const hills = './assets/images/hills.png';
-const bg = './assets/images/background.png';
-
-const platformImage = new Image();
-platformImage.src= platformSRC
-
-
-const canvas = document.querySelector('canvas');
-const c = canvas.getContext('2d');
-const gravity = 0.7;
-const keys = {
-    a: {pressed: false},
-    d: {pressed: false},
-    w: {pressed: false}
-};
-
-let scrollOffset = 0;
-
-canvas.width = 1024;
-canvas.height = 576;
-
 class Player {
-    constructor(){
+    constructor({imageSRC}){
         this.positon = { 
             x:100, 
             y:100
         }
-        this.width = 30
-        this.height = 30
+        this.width = 66
+        this.height = 150
         this.velocity = {
             x: 0,
             y: 0
         }
         this.lastKey
+        this.playerSpeed = 5
+        this.image = new Image();
+        this.image.src = imageSRC
+        this.frames = 0
     }
 
     draw(){
-        c.fillStyle = 'red';
-        c.fillRect(this.positon.x, this.positon.y, this.width, this.height);
-        
+        c.drawImage(this.image, 177 * this.frames, 0, 177, this.image.height, this.positon.x, this.positon.y, this.width, this.height);
     }
 
     update(){
+        this.frames++;
+        if(this.frames > 28){
+            this.frames = 0
+        }
         this.positon.y += this.velocity.y;
         this.positon.x += this.velocity.x;
         this.velocity.y += gravity;
-
-        // if(this.positon.y + this.height + this.velocity.y >= canvas.height){
-        //     this.velocity.y += 0;
-        // } else {
-        //     this.velocity.y += gravity;
-        // }
         this.draw();
     }
 }
-
 
 class Platform {
     constructor({positon, imageSRC}){
@@ -94,20 +70,64 @@ class Scenery {
     }
 }
 
-const sceen = [
-    new Scenery({positon:{x: 0, y: 0 }, imageSRC: bg }),
-    new Scenery({positon:{x: -1, y: -1 }, imageSRC: hills }),
-] 
+// Background Sprites ref
+const platformSRC = './assets/images/platform.png';
+const tallPlatform = './assets/images/platformSmallTall.png';
+const hills = './assets/images/hills.png';
+const bg = './assets/images/background.png';
 
-const player = new Player();
+// Character Sprites ref
+const spriteRunLeft = './assets/images/spriteRunLeft.png';
+const spriteRunRight = './assets/images/spriteRunRight.png';
+const spriteStandLeft = './assets/images/spriteStandLeft.png';
+const spriteStandRight = './assets/images/spriteStandRight.png';
 
-const platforms = [
-    new Platform({positon:{x: 0, y: 450 }, imageSRC: platformSRC }),
-    new Platform({positon:{x: platformImage.width + 100, y: 450 }, imageSRC: platformSRC }),
-    new Platform({positon:{x: (platformImage.width * 2) + 300, y: 450 }, imageSRC: platformSRC }),
-    new Platform({positon:{x: (platformImage.width * 3) + 600, y: 450 }, imageSRC: platformSRC }),
-];
+const platformImage = new Image();
+platformImage.src= platformSRC;
+const tallPlatformImge = new Image();
+tallPlatformImge.src = tallPlatform;
 
+const canvas = document.querySelector('canvas');
+const c = canvas.getContext('2d');
+const gravity = 0.7;
+const keys = {
+    a: {pressed: false},
+    d: {pressed: false},
+    w: {pressed: false}
+};
+
+let scrollOffset = 0;
+
+canvas.width = 1024;
+canvas.height = 576;
+
+let player;
+let sceen = []; 
+let platforms = [];
+
+function createImage(imageSRC) {
+    const img = new Image()
+    img.src = imageSRC;
+    return img;
+}
+
+function int() {
+     sceen = [
+        new Scenery({positon:{x: 0, y: 0 }, imageSRC: bg }),
+        new Scenery({positon:{x: -1, y: -1 }, imageSRC: hills }),
+    ] 
+    
+     player = new Player({imageSRC: spriteStandRight});
+    
+     platforms = [
+        new Platform({positon:{x: (platformImage.width * 3) + 10, y: 250 }, imageSRC: tallPlatform }),
+        new Platform({positon:{x: 0, y: 450 }, imageSRC: platformSRC }),
+        new Platform({positon:{x: platformImage.width + 100, y: 450 }, imageSRC: platformSRC }),
+        new Platform({positon:{x: (platformImage.width * 2) + 300, y: 450 }, imageSRC: platformSRC }),
+        new Platform({positon:{x: (platformImage.width * 4)+ 100, y: 450 }, imageSRC: platformSRC })
+    ];
+    scrollOffset = 0; 
+}
 
 function animate() {
     requestAnimationFrame(animate);
@@ -131,23 +151,6 @@ function animate() {
     }
 
     platforms.forEach(platform =>{
-        if (keys.d.pressed){
-            platform.positon.x -= 5;
-            sceen.forEach((scBG)=>{
-                scBG.positon.x -= 1;
-            })
-        
-            scrollOffset++;  
-        } else if (keys.a.pressed){
-            platform.positon.x += 5;
-            sceen.forEach((scBG)=>{
-                scBG.positon.x += 1;
-            })
-            scrollOffset--; 
-        }
-    });
-
-    platforms.forEach(platform =>{
         if(
             player.positon.y + player.height <= platform.positon.y &&
             player.positon.y + player.height + player.velocity.y >= platform.positon.y &&
@@ -156,10 +159,24 @@ function animate() {
         ){
             player.velocity.y = 0;
         }
+
+        if (keys.d.pressed){
+            platform.positon.x -= player.playerSpeed;
+            sceen.forEach((scBG)=>{
+                scBG.positon.x -= player.playerSpeed * .05;
+            })
+        
+            scrollOffset++;  
+        } else if (keys.a.pressed && scrollOffset > 0){
+            platform.positon.x += player.playerSpeed;
+            sceen.forEach((scBG)=>{
+                scBG.positon.x += player.playerSpeed * .05;
+            })
+            scrollOffset--; 
+        }
     });
 
     sceen.forEach((scBG)=>{
-        // console.log(scBG);
         scBG.draw();
     })
 
@@ -173,9 +190,11 @@ function animate() {
         console.log('You Win!');
     }
 
+    if(player.positon.y + player.height >= canvas.height){
+        int();
+    }
+
 }
-
-
 
 addEventListener('keydown', ({key})=>{
     switch (key) {
@@ -195,7 +214,6 @@ addEventListener('keydown', ({key})=>{
             }
             keys.w.pressed = true
             break;
-    
         default:
             break;
     }
@@ -219,4 +237,5 @@ addEventListener('keyup', ({key})=>{
     }
 });
 
+int();
 animate();
