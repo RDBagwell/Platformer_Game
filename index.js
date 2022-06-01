@@ -18,7 +18,16 @@ class Player {
     }
 
     draw(){
-        c.drawImage(this.image, 177 * this.frames, 0, 177, this.image.height, this.positon.x, this.positon.y, this.width, this.height);
+        c.drawImage(
+            this.image, 
+            177 * this.frames, 
+            0, 
+            177, 
+            this.image.height, 
+            this.positon.x, 
+            this.positon.y, 
+            this.width, 
+            this.height);
     }
 
     update(){
