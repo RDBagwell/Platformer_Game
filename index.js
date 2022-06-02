@@ -1,5 +1,5 @@
 class Player {
-    constructor({imageSRC}){
+    constructor(){
         this.positon = { 
             x:100, 
             y:100
@@ -12,17 +12,32 @@ class Player {
         }
         this.lastKey
         this.playerSpeed = 5
-        this.image = new Image();
-        this.image.src = imageSRC
+        this.image = createImage(spriteStandRight);
         this.frames = 0
+        this.sprites = {
+            stand:{
+                right: createImage(spriteStandRight),
+                left: createImage(spriteStandLeft),
+                cropWidth: 177,
+                width: 66
+            },
+            run: {
+                right: createImage(spriteRunRight),
+                left: createImage(spriteRunLeft),
+                cropWidth: 341,
+                width: 127.875
+            }
+        }
+        this.currentSprite = this.sprites.stand.right
+        this.currentCropWidth = 177
     }
 
     draw(){
         c.drawImage(
-            this.image, 
-            177 * this.frames, 
+            this.currentSprite, 
+            this.currentCropWidth * this.frames, 
             0, 
-            177, 
+            this.currentCropWidth, 
             this.image.height, 
             this.positon.x, 
             this.positon.y, 
@@ -32,7 +47,10 @@ class Player {
 
     update(){
         this.frames++;
-        if(this.frames > 28){
+        if(this.frames > 59 && 
+            this.currentSprite === this.sprites.stand.right || this.currentSprite === this.sprites.stand.left){
+            this.frames = 0
+        } else if(this.frames > 29 && this.currentSprite === this.sprites.run.right || this.currentSprite === this.sprites.run.left){
             this.frames = 0
         }
         this.positon.y += this.velocity.y;
@@ -126,7 +144,7 @@ function int() {
         new Scenery({positon:{x: -1, y: -1 }, imageSRC: hills }),
     ] 
     
-     player = new Player({imageSRC: spriteStandRight});
+     player = new Player();
     
      platforms = [
         new Platform({positon:{x: (platformImage.width * 3) + 10, y: 250 }, imageSRC: tallPlatform }),
@@ -210,10 +228,16 @@ addEventListener('keydown', ({key})=>{
         case "a":
             keys.a.pressed = true;
             player.lastKey = "left";
+            player.currentSprite = player.sprites.run.left;
+            player.currentCropWidth = player.sprites.run.cropWidth;
+            player.width = player.sprites.run.width;
             break;
         case "d":
             keys.d.pressed = true;
             player.lastKey = "right";
+            player.currentSprite = player.sprites.run.right;
+            player.currentCropWidth = player.sprites.run.cropWidth;
+            player.width = player.sprites.run.width;
             break;
         case "w":
             if(!keys.w.pressed){
@@ -232,9 +256,15 @@ addEventListener('keyup', ({key})=>{
     switch (key) {
         case "a":
             keys.a.pressed = false;
+            player.currentSprite = player.sprites.stand.left
+            player.currentCropWidth = player.sprites.stand.cropWidth
+            player.width = player.sprites.stand.width;
             break;
         case "d":
             keys.d.pressed = false;
+            player.currentSprite = player.sprites.stand.right
+            player.currentCropWidth = player.sprites.stand.cropWidth
+            player.width = player.sprites.stand.width;
             break;
         case "w":
             player.velocity.y = 0;
