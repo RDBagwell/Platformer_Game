@@ -185,6 +185,7 @@ function animate() {
             player.positon.x <= platform.positon.x + platform.width
         ){
             player.velocity.y = 0;
+            keys.w.pressed = false;
         }
 
         if (keys.d.pressed){
@@ -222,36 +223,37 @@ function animate() {
     }
 
 }
+if(!keys.w.pressed){
+    addEventListener('keydown', ({key})=>{
+        switch (key) {
+            case "a":
+                keys.a.pressed = true;
+                player.lastKey = "left";
+                player.currentSprite = player.sprites.run.left;
+                player.currentCropWidth = player.sprites.run.cropWidth;
+                player.width = player.sprites.run.width;
+                break;
+            case "d":
+                keys.d.pressed = true;
+                player.lastKey = "right";
+                player.currentSprite = player.sprites.run.right;
+                player.currentCropWidth = player.sprites.run.cropWidth;
+                player.width = player.sprites.run.width;
+                break;
+            case "w":
+                if(!keys.w.pressed){
+                    player.velocity.y -= 20;
+                    keys.w.pressed = true
+                } else {
+                    player.velocity.y += 0;
+                }
+                break;
+            default:
+                break;
+        }
+    });
 
-addEventListener('keydown', ({key})=>{
-    switch (key) {
-        case "a":
-            keys.a.pressed = true;
-            player.lastKey = "left";
-            player.currentSprite = player.sprites.run.left;
-            player.currentCropWidth = player.sprites.run.cropWidth;
-            player.width = player.sprites.run.width;
-            break;
-        case "d":
-            keys.d.pressed = true;
-            player.lastKey = "right";
-            player.currentSprite = player.sprites.run.right;
-            player.currentCropWidth = player.sprites.run.cropWidth;
-            player.width = player.sprites.run.width;
-            break;
-        case "w":
-            if(!keys.w.pressed){
-                player.velocity.y -= 20;
-            } else {
-                player.velocity.y += 0;  
-            }
-            keys.w.pressed = true
-            break;
-        default:
-            break;
-    }
-});
-
+}
 addEventListener('keyup', ({key})=>{
     switch (key) {
         case "a":
@@ -268,13 +270,14 @@ addEventListener('keyup', ({key})=>{
             break;
         case "w":
             player.velocity.y = 0;
-            keys.w.pressed = false;
             break;
     
         default:
             break;
     }
 });
+
+
 
 int();
 animate();
